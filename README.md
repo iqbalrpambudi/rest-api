@@ -9,7 +9,9 @@ Just run `npm start` in terminal
 ### Endpoint
 
 Get list film: `GET /api`
+
 Create film : `POST /api/film`
+
 Update film: `PUT /api/film/:id`
 
 ### Schema
