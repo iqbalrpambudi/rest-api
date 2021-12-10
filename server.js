@@ -1,42 +1,48 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const bodyParser = require('body-parser');
+require("dotenv").config()
+const express = require("express")
+const mongoose = require("mongoose")
+const route = require("./route/routes.js")
+const bodyParser = require("body-parser")
+const cors = require("cors")
 
-const MONGODB_URI = 'mongodb://localhost:27017/restapi'
-const userRoute = require('./route/route.js')
+// Init Express
+const app = express()
 
-mongoose.Promise = global.Promise;
-mongoose.connect(MONGODB_URI, {
-  useNewUrlParser: true
-}).then(() => {
-  console.log('Database sucessfully connected!')
-},
-  error => {
-    console.log('Could not connect to database : ' + error)
-  }
+// Use module express
+app.use(express.json())
+app.use(bodyParser.json())
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
 )
 
-const app = express();
+app.use("/api", route)
+app.use(cors())
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
-app.use(cors());
-app.use('/api', userRoute)
+// Connect MongoDB
+mongoose.connect(process.env.DATABASE, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
+})
+const db = mongoose.connection
+db.on("error", (error) => console.error(error))
+db.once("open", () => console.log("Database Connected"))
 
+// Express create error 404
 app.use((req, res, next) => {
-  next(createError(404));
-});
+  next(createError(404))
+})
 
 app.use(function (err, req, res, next) {
-  console.error(err.message);
-  if (!err.statusCode) err.statusCode = 500;
-  res.status(err.statusCode).send(err.message);
-});
+  console.error(err.message)
+  if (!err.statusCode) err.statusCode = 500
+  res.status(err.statusCode).send(err.message)
+})
 
-const port = process.env.PORT || 4000;
-const server = app.listen(port, () => {
-  console.log('Connected to port ' + port)
+const port = process.env.PORT || 4000
+app.listen(port, () => {
+  console.log("Connected to port " + port)
 })
