@@ -4,6 +4,7 @@ const mongoose = require("mongoose")
 const route = require("./route/routes.js")
 const bodyParser = require("body-parser")
 const cors = require("cors")
+const createError = require("http-errors")
 
 // Init Express
 const app = express()
@@ -11,14 +12,18 @@ const app = express()
 // Use module express
 app.use(express.json())
 app.use(bodyParser.json())
+app.use(cors())
 app.use(
   bodyParser.urlencoded({
     extended: true,
   })
 )
 
+// Use Route
+app.get("/", (req, res) => {
+  res.send("Welcome to my rest API :), use /api endpoint to fetch data")
+})
 app.use("/api", route)
-app.use(cors())
 
 // Connect MongoDB
 mongoose.connect(process.env.DATABASE, {
